@@ -128,6 +128,12 @@ func generateSpringProject() error {
 	}
 	fmt.Println("✅ Added Helm chart")
 
+	// ArgoCD 매니페스트 추가
+	if err := writeArgoCDManifest(projectName); err != nil {
+		return err
+	}
+	fmt.Println("✅ Added Argo CD manifest")
+
 	// GitHub Repo 생성 & Push
 	if pushToGitHub {
 		if err := initGitAndPushAPI(projectName); err != nil {

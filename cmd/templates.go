@@ -91,3 +91,36 @@ spec:
 
 	return nil
 }
+
+func writeArgoCDManifest(projectDir string) error {
+	manifestDir := filepath.Join(projectDir, "manifests")
+	if err := os.MkdirAll(manifestDir, 0755); err != nil {
+		return err
+	}
+
+	appYaml := fmt.Sprintf(`apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: %s
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  source:
+    repoURL: https://github.com/${GITHUB_REPOSITORY}
+    targetRevision: main
+    path: charts/%s
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+`, projectName, projectName)
+
+	if err := os.WriteFile(filepath.Join(manifestDir, "argocd-app.yaml"), []byte(appYaml), 0644); err != nil {
+		return err
+	}
+
+	return nil
+}
