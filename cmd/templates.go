@@ -22,16 +22,24 @@ appVersion: "1.0.0"
 		return err
 	}
 
+	var imageRepo string
+	switch registry {
+	case "ecr":
+		imageRepo = fmt.Sprintf("${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-2.amazonaws.com/%s", projectName)
+	default: // ghcr
+		imageRepo = fmt.Sprintf("ghcr.io/${GITHUB_REPOSITORY}/%s", projectName)
+	}
+
 	// values.yaml
 	values := fmt.Sprintf(`image:
-  repository: ghcr.io/YOUR_GITHUB/%s
+  repository: %s
   tag: latest
   pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
   port: 80
-`, projectName)
+`, imageRepo)
 	if err := os.WriteFile(filepath.Join(chartDir, "values.yaml"), []byte(values), 0644); err != nil {
 		return err
 	}
