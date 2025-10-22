@@ -17,6 +17,7 @@ var (
 	groupId      string
 	artifactId   string
 	packageName  string
+	buildTool    string
 	javaVersion  int
 	pushToGitHub bool
 )
@@ -34,15 +35,24 @@ func init() {
 	springCmd.Flags().StringVar(&groupId, "group", "com.example", "Group ID")
 	springCmd.Flags().StringVar(&artifactId, "artifact", "demo", "Artifact ID")
 	springCmd.Flags().StringVar(&packageName, "package", "com.example.demo", "Base package")
+	springCmd.Flags().StringVar(&buildTool, "build", "maven", "Build tool (maven|gradle|gradle-kotlin)")
 	springCmd.Flags().IntVar(&javaVersion, "java", 17, "Java version")
 	springCmd.Flags().BoolVar(&pushToGitHub, "push", false, "Push project to GitHub")
 	rootCmd.AddCommand(springCmd)
 }
 
 func generateSpringProject() error {
+	buildType := "maven-project"
+	switch buildTool {
+	case "gradle":
+		buildType = "gradle-project"
+	case "gradle-kotlin":
+		buildType = "gradle-project-kotlin"
+	}
+
 	url := fmt.Sprintf(
-		"https://start.spring.io/starter.zip?type=maven-project&language=java&groupId=%s&artifactId=%s&name=%s&packageName=%s&javaVersion=%d&dependencies=web,actuator",
-		groupId, artifactId, projectName, packageName, javaVersion,
+		"https://start.spring.io/starter.zip?type=%s&language=java&groupId=%s&artifactId=%s&name=%s&packageName=%s&javaVersion=%d&dependencies=web,actuator",
+		buildType, groupId, artifactId, projectName, packageName, javaVersion,
 	)
 
 	// 1. ZIP 다운로드
