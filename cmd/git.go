@@ -19,7 +19,7 @@ func initGitAndPushAPI(projectName string) error {
 	// repo 생성 요청
 	body := map[string]any{
 		"name":    projectName,
-		"private": false,
+		"private": isPrivate,
 	}
 	data, _ := json.Marshal(body)
 	req, _ := http.NewRequest("POST", "https://api.github.com/user/repos", bytes.NewReader(data))

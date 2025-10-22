@@ -20,6 +20,7 @@ var (
 	buildTool    string
 	javaVersion  int
 	pushToGitHub bool
+	isPrivate    bool
 )
 var springCmd = &cobra.Command{
 	Use:   "spring",
@@ -38,6 +39,7 @@ func init() {
 	springCmd.Flags().StringVar(&buildTool, "build", "maven", "Build tool (maven|gradle|gradle-kotlin)")
 	springCmd.Flags().IntVar(&javaVersion, "java", 17, "Java version")
 	springCmd.Flags().BoolVar(&pushToGitHub, "push", false, "Push project to GitHub")
+	springCmd.Flags().BoolVar(&isPrivate, "private", false, "Create GitHub repository as private")
 	rootCmd.AddCommand(springCmd)
 }
 
@@ -158,6 +160,10 @@ on:
   push:
     branches: [ main ]
   pull_request:
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build-test:
