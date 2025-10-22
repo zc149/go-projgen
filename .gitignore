@@ -1,0 +1,51 @@
+# ---- Go ----
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go workspace
+bin/
+pkg/
+*.prof
+*.pprof
+
+# Dependency directories (not needed in VCS)
+vendor/
+
+# ---- IDE & Editor ----
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# ---- Environment ----
+.env
+*.local
+
+# ---- Logs ----
+*.log
+*.tmp
+
+# ---- Build outputs ----
+# CLI 빌드 산출물
+/projgen
+/projgen.exe
+
+# ---- Spring Boot Generated Projects ----
+# projgen이 생성하는 Java 빌드 산출물 무시
+**/target/
+**/.mvn/
+**/.gradle/
+**/build/
+**/out/
+
+# Spring IDE files
+**/.classpath
+**/.project
+**/.settings/

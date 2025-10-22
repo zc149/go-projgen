@@ -13,18 +13,18 @@ import (
 )
 
 var (
-	projectName string
-	groupId     string
-	artifactId  string
-	packageName string
-	javaVersion int
+	projectName  string
+	groupId      string
+	artifactId   string
+	packageName  string
+	javaVersion  int
+	pushToGitHub bool
 )
 var springCmd = &cobra.Command{
 	Use:   "spring",
 	Short: "Generate a new Spring Boot project",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Printf("🚀 Generating Spring Boot project: %s\n", projectName)
-		// TODO: Spring Initializr API 호출 → ZIP 다운로드/압축 해제
 		return generateSpringProject()
 	},
 }
@@ -35,6 +35,7 @@ func init() {
 	springCmd.Flags().StringVar(&artifactId, "artifact", "demo", "Artifact ID")
 	springCmd.Flags().StringVar(&packageName, "package", "com.example.demo", "Base package")
 	springCmd.Flags().IntVar(&javaVersion, "java", 17, "Java version")
+	springCmd.Flags().BoolVar(&pushToGitHub, "push", false, "Push project to GitHub")
 	rootCmd.AddCommand(springCmd)
 }
 
@@ -110,6 +111,14 @@ func generateSpringProject() error {
 		return err
 	}
 	fmt.Println("✅ Added Helm chart")
+
+	// GitHub Repo 생성 & Push
+	if pushToGitHub {
+		if err := initGitAndPushAPI(projectName); err != nil {
+			return err
+		}
+		fmt.Println("✅ GitHub repo created & pushed")
+	}
 
 	return nil
 }
