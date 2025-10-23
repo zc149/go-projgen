@@ -32,7 +32,7 @@ CLI 기반 **GitOps 프로젝트 생성기**
 `projgen` 은 소스 빌드 없이 **릴리즈된 실행 파일**을 바로 사용하면 됩니다.  
 GitHub Releases 페이지에서 운영체제에 맞는 바이너리를 다운로드하세요.
 
-- [Releases 페이지 바로가기](https://github.com/your-org/projgen/releases)
+- [Releases 페이지 바로가기](https://github.com/zc149/go-projgen/releases/tag/v1.0.0)
 
 예:
 - Windows → `projgen_windows_amd64.exe`
