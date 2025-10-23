@@ -27,9 +27,37 @@ CLI 기반 **GitOps 프로젝트 생성기**
 
 ---
 
+## 🚀 설치 방법
+
+`projgen` 은 소스 빌드 없이 **릴리즈된 실행 파일**을 바로 사용하면 됩니다.  
+GitHub Releases 페이지에서 운영체제에 맞는 바이너리를 다운로드하세요.
+
+- [Releases 페이지 바로가기](https://github.com/your-org/projgen/releases)
+
+예:
+- Windows → `projgen_windows_amd64.exe`
+- macOS (Intel) → `projgen_darwin_amd64`
+- macOS (Apple Silicon) → `projgen_darwin_arm64`
+- Linux → `projgen_linux_amd64`
+
+다운로드 후 PATH 에 추가하거나, 원하는 디렉토리에 두고 실행하면 됩니다.
+
+### 1) 직접 실행
+압축 해제 후 실행 권한을 주고 바로 실행할 수 있습니다.
+```bash
+chmod +x projgen-darwin-arm64
+./projgen-darwin-arm64 spring --help
+```
+
+자주 사용할 경우, 실행 파일을 PATH 경로에 옮겨두면 어디서든 projgen 명령으로 실행 가능합니다.
+
+---
+
 ## ⚙️ 필수 환경 변수 (.env)
 
 GitHub 에 푸시하려면 **반드시 두 개 변수가 필요**합니다.
+
+프로젝트 생성을 위해 `.env` 파일을 **실행 파일과 같은 경로**에 준비하세요.
 
 ```env
 GITHUB_TOKEN=ghp_xxx   # GitHub Personal Access Token (repo, workflow 권한 필수)
@@ -44,8 +72,8 @@ GITHUB_OWNER=kimjikwan # GitHub username 또는 org name
 
 Spring Boot 프로젝트 생성 예시:
 
-``` 
-go run main.go spring \
+```
+./projgen-darwin-arm64 spring \
   --name my-spring-app \
   --group com.mycompany \
   --artifact my-spring-app \
@@ -59,7 +87,7 @@ go run main.go spring \
 React 프로젝트 생성 예시:
 
 ```
-go run main.go react \
+./projgen-darwin-arm64 react \
   --name my-react-app \
   --node 20 \
   --push \
@@ -71,6 +99,6 @@ go run main.go react \
 모든 옵션과 기본값은 `--help` 플래그로 확인하세요:
 
 ```bash
-go run main.go spring --help
-go run main.go react --help
+./projgen-darwin-arm64 spring --help
+./projgen-darwin-arm64 react --help
 
