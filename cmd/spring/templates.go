@@ -1,4 +1,4 @@
-package cmd
+package spring
 
 import (
 	"fmt"
@@ -22,16 +22,24 @@ appVersion: "1.0.0"
 		return err
 	}
 
+	var imageRepo string
+	switch registry {
+	case "ecr":
+		imageRepo = fmt.Sprintf("${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-2.amazonaws.com/%s", projectName)
+	default: // ghcr
+		imageRepo = fmt.Sprintf("ghcr.io/${GITHUB_REPOSITORY}/%s", projectName)
+	}
+
 	// values.yaml
 	values := fmt.Sprintf(`image:
-  repository: ghcr.io/YOUR_GITHUB/%s
+  repository: %s
   tag: latest
   pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
   port: 80
-`, projectName)
+`, imageRepo)
 	if err := os.WriteFile(filepath.Join(chartDir, "values.yaml"), []byte(values), 0644); err != nil {
 		return err
 	}
@@ -78,6 +86,39 @@ spec:
       targetPort: 8080
 `
 	if err := os.WriteFile(filepath.Join(chartDir, "templates", "service.yaml"), []byte(service), 0644); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func writeArgoCDManifest(projectDir string) error {
+	manifestDir := filepath.Join(projectDir, "manifests")
+	if err := os.MkdirAll(manifestDir, 0755); err != nil {
+		return err
+	}
+
+	appYaml := fmt.Sprintf(`apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: %s
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  source:
+    repoURL: https://github.com/${GITHUB_REPOSITORY}
+    targetRevision: main
+    path: charts/%s
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+`, projectName, projectName)
+
+	if err := os.WriteFile(filepath.Join(manifestDir, "argocd-app.yaml"), []byte(appYaml), 0644); err != nil {
 		return err
 	}
 
