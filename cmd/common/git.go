@@ -1,4 +1,4 @@
-package cmd
+package common
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func initGitAndPushAPI(projectName string) error {
+func InitGitAndPushAPI(projectName string, isPrivate bool) error {
 	token := os.Getenv("GITHUB_TOKEN")
 	if token == "" {
 		return fmt.Errorf("❌ GITHUB_TOKEN not set")

@@ -1,4 +1,4 @@
-package cmd
+package react
 
 import (
 	"fmt"
@@ -30,7 +30,7 @@ appVersion: "1.0.0"
 		imageRepo = fmt.Sprintf("ghcr.io/${GITHUB_REPOSITORY}/%s", projectName)
 	}
 
-	// values.yaml
+	// values.yaml (React → Nginx 포트 80)
 	values := fmt.Sprintf(`image:
   repository: %s
   tag: latest
@@ -39,7 +39,18 @@ appVersion: "1.0.0"
 service:
   type: ClusterIP
   port: 80
-`, imageRepo)
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: %s.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+`, imageRepo, projectName)
 	if err := os.WriteFile(filepath.Join(chartDir, "values.yaml"), []byte(values), 0644); err != nil {
 		return err
 	}
@@ -62,10 +73,10 @@ spec:
         app: {{ include "` + projectName + `.name" . }}
     spec:
       containers:
-        - name: api
+        - name: frontend
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           ports:
-            - containerPort: 8080
+            - containerPort: 80
 `
 	if err := os.WriteFile(filepath.Join(chartDir, "templates", "deployment.yaml"), []byte(deployment), 0644); err != nil {
 		return err
@@ -83,9 +94,39 @@ spec:
   ports:
     - name: http
       port: {{ .Values.service.port }}
-      targetPort: 8080
+      targetPort: 80
 `
 	if err := os.WriteFile(filepath.Join(chartDir, "templates", "service.yaml"), []byte(service), 0644); err != nil {
+		return err
+	}
+
+	// ingress.yaml (선택)
+	ingress := `{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "` + projectName + `.fullname" . }}
+  annotations:
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+spec:
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ include "` + projectName + `.fullname" $ }}
+                port:
+                  number: {{ $.Values.service.port }}
+          {{- end }}
+    {{- end }}
+{{- end }}
+`
+	if err := os.WriteFile(filepath.Join(chartDir, "templates", "ingress.yaml"), []byte(ingress), 0644); err != nil {
 		return err
 	}
 

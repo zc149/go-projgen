@@ -1,4 +1,4 @@
-package cmd
+package spring
 
 import (
 	"archive/zip"
@@ -8,6 +8,9 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"projgen/cmd"
+	"projgen/cmd/common"
 
 	"github.com/spf13/cobra"
 )
@@ -43,7 +46,7 @@ func init() {
 	springCmd.Flags().BoolVar(&pushToGitHub, "push", false, "Push project to GitHub")
 	springCmd.Flags().BoolVar(&isPrivate, "private", false, "Create GitHub repository as private")
 	springCmd.Flags().StringVar(&registry, "registry", "ghcr", "Container registry (ghcr|ecr)")
-	rootCmd.AddCommand(springCmd)
+	cmd.RootCmd.AddCommand(springCmd)
 }
 
 func generateSpringProject() error {
@@ -136,7 +139,7 @@ func generateSpringProject() error {
 
 	// GitHub Repo 생성 & Push
 	if pushToGitHub {
-		if err := initGitAndPushAPI(projectName); err != nil {
+		if err := common.InitGitAndPushAPI(projectName, isPrivate); err != nil {
 			return err
 		}
 		fmt.Println("✅ GitHub repo created & pushed")
